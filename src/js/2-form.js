@@ -1,3 +1,9 @@
+const STORAGE_KEY = 'feedback-form-state';
+let formData = {
+  email: '',
+  message: '',
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   const divContainer = document.createElement('div');
   divContainer.classList.add('form-container');
@@ -7,16 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   divContainer.appendChild(form);
   document.body.appendChild(divContainer);
+
+  populateFormFromLocalStorage(form);
+
+  form.addEventListener('input', event => handleInput(event, form));
+  form.addEventListener('submit', event => handleSubmit(event, form));
 });
 
-const formData = {
-  email: '',
-  message: '',
-};
-
-const STORAGE_KEY = 'feedback-form-state';
-
-function populateFormFromLocalStorage() {
+function populateFormFromLocalStorage(form) {
   const savedData = localStorage.getItem(STORAGE_KEY);
 
   if (savedData) {
@@ -26,12 +30,13 @@ function populateFormFromLocalStorage() {
   }
 }
 
-function handleInput(event) {
+function handleInput(event, form) {
   formData[event.target.name] = event.target.value;
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 }
-function handleSubmit(event) {
+
+function handleSubmit(event, form) {
   event.preventDefault();
 
   if (!formData.email || !formData.message) {
@@ -43,9 +48,5 @@ function handleSubmit(event) {
 
   localStorage.removeItem(STORAGE_KEY);
   form.reset();
+  formData = { email: '', message: '' };
 }
-
-form.addEventListener('input', handleInput);
-form.addEventListener('submit', handleSubmit);
-
-populateFormFromLocalStorage();
